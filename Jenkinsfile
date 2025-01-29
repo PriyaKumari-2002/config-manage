@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // IBM Cloud Container Registry credentials
-        IBM_CLOUD_API_KEY = credentials('ibm-cloud-api-key')
+        IBM_CLOUD_API_KEY = credentials('ibmcloud-api-key')
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
         IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'
     }
