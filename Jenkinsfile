@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\WINDOWS\\SYSTEM32"
+        env.PATH = env.PATH + ";c:\\Windows\\System32"
         DOCKER_HOST = 'tcp://localhost:2375'  // Use the Docker API over TCP if required
         IBM_CLOUD_API_KEY = credentials('ibmcloud-api-key')
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
