@@ -31,8 +31,8 @@ pipeline {
             steps {
                 script {
                     // Authenticate with IBM Cloud
-                    sh "ibmcloud login --apikey $IBM_CLOUD_API_KEY"
-                    sh "ibmcloud cr login"
+                    bat "ibmcloud login --apikey $IBM_CLOUD_API_KEY"
+                    bat "ibmcloud cr login"
 
                     // Tag and push the Docker image
                     docker.withRegistry("https://${IBM_CLOUD_REGISTRY_URL}", "ibm-cloud-credentials") {
@@ -47,8 +47,8 @@ pipeline {
             steps {
                 script {
                     // Apply Kubernetes manifests
-                    sh "kubectl apply -f k8s/deployment.yaml"
-                    sh "kubectl apply -f k8s/service.yaml"
+                    bat "kubectl apply -f k8s/deployment.yaml"
+                    bat "kubectl apply -f k8s/service.yaml"
                 }
             }
         }
