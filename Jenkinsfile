@@ -26,6 +26,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    bat '"C:\\Windows\\System32\\cmd.exe" /c echo Hello'
                     bat "ibmcloud login --apikey $IBM_CLOUD_API_KEY -r us-south"
                     bat "ibmcloud cr login"
 
