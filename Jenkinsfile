@@ -16,6 +16,11 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/PriyaKumari-2002/config-manage.git'
             }
         }
+        stage('Test IBM Cloud CLI') {
+    steps {
+        bat 'ibmcloud --version'
+            }
+    }
 
         // Stage 2: Build Docker image
         stage('Build Docker Image') {
