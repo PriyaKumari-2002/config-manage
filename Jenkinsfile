@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_HOST = 'tcp://localhost:2375'  // Use the Docker API over TCP if required
         // IBM Cloud Container Registry credentials
         IBM_CLOUD_API_KEY = credentials('ibmcloud-api-key')
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
