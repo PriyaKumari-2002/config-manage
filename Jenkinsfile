@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Test IBM Cloud CLI') {
     steps {
-        bat 'ibmcloud --version'
+         bat '"C:\\Windows\\System32\\cmd.exe" /c ibmcloud --version'
             }
     }
 
