@@ -30,13 +30,14 @@ pipeline {
             steps {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
+                     withCredentials([string(credentialsId: 'ibm-cloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
 
                     // Use Trusted Profile Login Instead of API Key
                     bat """
                     echo 🔐 Logging into IBM Cloud with Trusted Profile...
-                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --profile-id Profile-d0712891-efc9-4427-bff4-1b7bbc258c58 -r in-che
+                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IBM_CLOUD_API_KEY%  -r in-che
                     "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
-                    """
+                    """}
 
                     // Tag and Push Docker Image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
