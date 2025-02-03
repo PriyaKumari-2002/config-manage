@@ -30,7 +30,7 @@ pipeline {
             steps {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
-                     withCredentials([string(credentialsId: 'ibm-cloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                     withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
 
                     // Use Trusted Profile Login Instead of API Key
                     bat """
