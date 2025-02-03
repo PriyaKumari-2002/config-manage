@@ -31,10 +31,10 @@ pipeline {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
 
-                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IC_API_KEY')]) {
+                  
                         bat """
                         echo 🔐 Logging into IBM Cloud...
-                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IC_API_KEY% -r in-che
+                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --profile-id Profile-d0712891-efc9-4427-bff4-1b7bbc258c58 -r in-che
                         "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
                         """
                     }
