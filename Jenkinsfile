@@ -30,9 +30,9 @@ pipeline {
                     bat 'echo Hello'
                     
                     // IBM Cloud Login
-                    bat 'ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r us-south'
-                    bat 'ibmcloud cr login'
-
+                    bat '"C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IBM_CLOUD_API_KEY% -r in-che '
+                    bat '"C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login'
+                    
                     // Tag and push the Docker image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
                     bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" tag config-manage:latest %imageName%'
