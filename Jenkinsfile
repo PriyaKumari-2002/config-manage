@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Windows\\System32"
-        DOCKER_HOST = 'tcp://localhost:2375'  // Use the Docker API over TCP if required
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"  // Added Docker to PATH
+        DOCKER_HOST = 'tcp://localhost:2375'  // Expose Docker daemon if needed
         IBM_CLOUD_API_KEY = credentials('ibmcloud-api-key')
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
         IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'
@@ -19,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("config-manage:latest", "--file=docker/Dockerfile .")
+                    bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t config-manage:latest --file=docker/Dockerfile .'
                 }
             }
         }
@@ -27,13 +27,16 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    sh '"C:\\Windows\\System32\\cmd.exe" /c echo Hello'
-                    sh "ibmcloud login --apikey $IBM_CLOUD_API_KEY -r us-south"
-                    sh "ibmcloud cr login"
+                    bat 'echo Hello'
+                    
+                    // IBM Cloud Login
+                    bat 'ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r us-south'
+                    bat 'ibmcloud cr login'
 
+                    // Tag and push the Docker image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
-                    sh "docker tag config-manage:latest ${imageName}"
-                    sh "docker push ${imageName}"
+                    bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" tag config-manage:latest %imageName%'
+                    bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" push %imageName%'
                 }
             }
         }
@@ -41,9 +44,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh "ibmcloud ks cluster config --cluster <your-cluster-name>"
-                    sh "kubectl apply -f k8s/deployment.yaml"
-                    sh "kubectl apply -f k8s/service.yaml"
+                    bat 'ibmcloud ks cluster config --cluster <your-cluster-name>'
+                    bat 'kubectl apply -f k8s/deployment.yaml'
+                    bat 'kubectl apply -f k8s/service.yaml'
                 }
             }
         }
@@ -51,10 +54,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed!'
+            echo '❌ Pipeline failed!'
         }
     }
 }
