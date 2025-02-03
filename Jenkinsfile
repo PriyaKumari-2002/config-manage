@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"  
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"
         DOCKER_HOST = 'tcp://localhost:2375'  
-        IBM_CLOUD_API_KEY = credentials('ibmcloud-api-key')
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Chennai is jp.icr.io
+        IBM_CLOUD_REGISTRY_URL = 'in-che.icr.io'  // Correct IBM Container Registry for Chennai
     }
 
     stages {
@@ -19,7 +18,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t config-manage:latest -f docker/Dockerfile .'
+                    bat """
+                    echo Building Docker Image...
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t config-manage:latest -f docker/Dockerfile .
+                    """
                 }
             }
         }
@@ -27,16 +29,23 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    bat 'echo Hello'
+                    bat 'echo Preparing to push Docker image...'
 
-                    // IBM Cloud Login with API Key (Using Groovy Variable Instead of %IBM_CLOUD_API_KEY%)
-                    bat "\"C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe\" login --apikey ${IBM_CLOUD_API_KEY} -r in-che"
-                    bat "\"C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe\" cr login"
+                    withEnv(["IC_API_KEY=${IBM_CLOUD_API_KEY}"]) { // Securely Pass API Key
+                        bat """
+                        echo Logging into IBM Cloud...
+                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IC_API_KEY% -r in-che
+                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
+                        """
+                    }
 
                     // Tag and Push Docker Image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
-                    bat "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe\" tag config-manage:latest ${imageName}"
-                    bat "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe\" push ${imageName}"
+                    bat """
+                    echo Tagging and Pushing Docker Image...
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" tag config-manage:latest ${imageName}
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" push ${imageName}
+                    """
                 }
             }
         }
@@ -44,9 +53,14 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    bat "\"C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe\" ks cluster config --cluster <your-cluster-name>"
-                    bat "kubectl apply -f k8s/deployment.yaml"
-                    bat "kubectl apply -f k8s/service.yaml"
+                    bat """
+                    echo Configuring Kubernetes Cluster...
+                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" ks cluster config --cluster <your-cluster-name>
+
+                    echo Deploying to Kubernetes...
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                    """
                 }
             }
         }
