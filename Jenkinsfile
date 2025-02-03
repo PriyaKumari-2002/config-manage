@@ -6,6 +6,9 @@ pipeline {
         DOCKER_HOST = 'tcp://localhost:2375'
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
         IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Chennai
+        IBM_CLOUD_REGION = 'in-che'  // Specify your region, e.g., 'in-che' for Chennai
+        // Trusted Profile ID (replace with actual Profile ID)
+        IBM_CLOUD_PROFILE_ID = 'Profile-d0712891-efc9-4427-bff4-1b7bbc258c58'
     }
 
     stages {
@@ -30,14 +33,15 @@ pipeline {
             steps {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
-                     withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
 
-                    // Use Trusted Profile Login Instead of API Key
-                    bat """
-                    echo 🔐 Logging into IBM Cloud with Trusted Profile...
-                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IBM_CLOUD_API_KEY%  -r in-che
-                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
-                    """}
+                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                        // IBM Cloud Login with Trusted Profile ID (Using API Key)
+                        bat """
+                        echo 🔐 Logging into IBM Cloud with Trusted Profile...
+                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IBM_CLOUD_API_KEY% --profile %IBM_CLOUD_PROFILE_ID% -r %IBM_CLOUD_REGION%
+                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
+                        """
+                    }
 
                     // Tag and Push Docker Image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
