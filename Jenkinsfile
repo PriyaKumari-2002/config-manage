@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"
-        DOCKER_HOST = 'tcp://localhost:2375'  
+        DOCKER_HOST = 'tcp://localhost:2375'
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // Correct IBM Container Registry for Chennai
+        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Chennai
     }
 
     stages {
@@ -31,13 +31,12 @@ pipeline {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
 
-                  
-                        bat """
-                        echo 🔐 Logging into IBM Cloud...
-                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --profile-id Profile-d0712891-efc9-4427-bff4-1b7bbc258c58 -r in-che
-                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
-                        """
-                    }
+                    // Use Trusted Profile Login Instead of API Key
+                    bat """
+                    echo 🔐 Logging into IBM Cloud with Trusted Profile...
+                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --profile-id Profile-d0712891-efc9-4427-bff4-1b7bbc258c58 -r in-che
+                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
+                    """
 
                     // Tag and Push Docker Image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
@@ -53,16 +52,14 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IC_API_KEY')]) {
-                        bat """
-                        echo ⚙️ Configuring Kubernetes Cluster...
-                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" ks cluster config --cluster <your-cluster-name>
+                    bat """
+                    echo ⚙️ Configuring Kubernetes Cluster...
+                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" ks cluster config --cluster <your-cluster-name>
 
-                        echo 📡 Deploying to Kubernetes...
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl apply -f k8s/service.yaml
-                        """
-                    }
+                    echo 📡 Deploying to Kubernetes...
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                    """
                 }
             }
         }
