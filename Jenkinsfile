@@ -5,7 +5,7 @@ pipeline {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"
         DOCKER_HOST = 'tcp://localhost:2375'  
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'in-che.icr.io'  // Correct IBM Container Registry for Chennai
+        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // Correct IBM Container Registry for Chennai
     }
 
     stages {
