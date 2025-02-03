@@ -6,7 +6,7 @@ pipeline {
         DOCKER_HOST = 'tcp://localhost:2375'  // Expose Docker daemon if needed
         IBM_CLOUD_API_KEY = credentials('ibmcloud-api-key')
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'
+        IBM_CLOUD_REGISTRY_URL = 'in-che.icr.io'
     }
 
     stages {
