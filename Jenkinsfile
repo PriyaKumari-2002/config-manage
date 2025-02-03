@@ -27,13 +27,13 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    bat '"C:\\Windows\\System32\\cmd.exe" /c echo Hello'
-                    bat "ibmcloud login --apikey $IBM_CLOUD_API_KEY -r us-south"
-                    bat "ibmcloud cr login"
+                    sh '"C:\\Windows\\System32\\cmd.exe" /c echo Hello'
+                    sh "ibmcloud login --apikey $IBM_CLOUD_API_KEY -r us-south"
+                    sh "ibmcloud cr login"
 
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
-                    bat "docker tag config-manage:latest ${imageName}"
-                    bat "docker push ${imageName}"
+                    sh "docker tag config-manage:latest ${imageName}"
+                    sh "docker push ${imageName}"
                 }
             }
         }
@@ -41,9 +41,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    bat "ibmcloud ks cluster config --cluster <your-cluster-name>"
-                    bat "kubectl apply -f k8s/deployment.yaml"
-                    bat "kubectl apply -f k8s/service.yaml"
+                    sh "ibmcloud ks cluster config --cluster <your-cluster-name>"
+                    sh "kubectl apply -f k8s/deployment.yaml"
+                    sh "kubectl apply -f k8s/service.yaml"
                 }
             }
         }
