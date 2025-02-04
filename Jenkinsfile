@@ -38,7 +38,7 @@ pipeline {
 
                 echo 🔐 Logging into IBM Cloud...
                 ibmcloud login -a https://cloud.ibm.com -u kumari.priyakumari002@gmail.com -p Pk@28022002!
-                ibmcloud target -r ap-north
+                ibmcloud cr region-set ap-north
                 ibmcloud cr login
                 ibmcloud cr login --client docker
                 """
