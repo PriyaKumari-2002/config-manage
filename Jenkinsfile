@@ -31,7 +31,7 @@ pipeline {
                     bat 'echo 📦 Preparing to push Docker image...'
 
                     // Log in to IBM Cloud using API Key
-                    withCredentials([string(credentialsId: 'ibm-cloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
                         bat """
                         echo 🔐 Logging into IBM Cloud...
                         ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r jp-tok
