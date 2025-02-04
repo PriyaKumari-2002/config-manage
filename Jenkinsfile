@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\IBM\\Cloud\\bin;C:\\Windows\\System32"
-        IBM_CLOUD_REGION = 'jp-tok'
+        IBM_CLOUD_REGION = 'in-che'
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Tokyo
+        IBM_CLOUD_REGISTRY_URL = 'in.icr.io'  // IBM Container Registry for Tokyo
     }
 
     stages {
@@ -31,17 +31,16 @@ pipeline {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
 
-                    // Log in to IBM Cloud using API Key
                     withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
                         bat """
-                        echo 🔐 Logging into IBM Cloud...
+                        echo 🔐 Setting IBM Cloud API Endpoint...
+                        ibmcloud api https://cloud.ibm.com
                         ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r %IBM_CLOUD_REGION%
                         ibmcloud target -r %IBM_CLOUD_REGION%
                         ibmcloud cr login
                         """
                     }
 
-                    // Tag and Push Docker Image
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
                     bat """
                     echo 🚀 Tagging and Pushing Docker Image...
