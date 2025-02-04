@@ -26,31 +26,32 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    bat 'echo 📦 Preparing to push Docker image...'
+       stage('Push Docker Image') {
+    steps {
+        script {
+            bat 'echo 📦 Preparing to push Docker image...'
 
-                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
-                        bat """
-                        echo 🔐 Setting IBM Cloud API Endpoint...
-                        ibmcloud api https://cloud.ibm.com
-                        ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r %IBM_CLOUD_REGION%
-                        ibmcloud target -r %IBM_CLOUD_REGION%
-                        ibmcloud cr login
-                        """
-                    }
+            withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                bat """
+                echo 🔐 Setting IBM Cloud API Endpoint...
+                ibmcloud api https://cloud.ibm.com
 
-                    def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
-                    bat """
-                    echo 🚀 Tagging and Pushing Docker Image...
-                    docker tag config-manage:latest ${imageName}
-                    docker push ${imageName}
-                    """
-                }
+                echo 🔐 Logging into IBM Cloud...
+                ibmcloud login --apikey %IBM_CLOUD_API_KEY%
+                ibmcloud target -r in-che
+                ibmcloud cr login
+                """
             }
-        }
 
+            def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
+            bat """
+            echo 🚀 Tagging and Pushing Docker Image...
+            docker tag config-manage:latest ${imageName}
+            docker push ${imageName}
+            """
+        }
+    }
+}
         stage('Deploy to Kubernetes') {
             steps {
                 script {
