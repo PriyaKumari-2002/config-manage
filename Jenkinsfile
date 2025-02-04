@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\IBM\\Cloud\\bin;C:\\Windows\\System32"
+        IBM_CLOUD_REGION = 'jp-tok'
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
         IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Tokyo
     }
@@ -34,7 +35,8 @@ pipeline {
                     withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
                         bat """
                         echo 🔐 Logging into IBM Cloud...
-                        ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r jp-tok
+                        ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r %IBM_CLOUD_REGION%
+                        ibmcloud target -r %IBM_CLOUD_REGION%
                         ibmcloud cr login
                         """
                     }
@@ -53,10 +55,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'ibm-cloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
                         bat """
                         echo ⚙️ Configuring Kubernetes Cluster...
-                        ibmcloud ks cluster config --cluster <your-cluster-name>
+                        ibmcloud ks cluster config --cluster YOUR_CLUSTER_NAME
 
                         echo 📡 Deploying to Kubernetes...
                         kubectl apply -f k8s/deployment.yaml
