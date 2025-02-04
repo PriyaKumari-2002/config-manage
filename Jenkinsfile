@@ -5,7 +5,7 @@ pipeline {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\IBM\\Cloud\\bin;C:\\Windows\\System32"
         IBM_CLOUD_REGION = 'in-che'
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'in.icr.io'  // IBM Container Registry for Tokyo
+        IBM_CLOUD_REGISTRY_URL = 'au.icr.io'  // IBM Container Registry for Tokyo
     }
 
     stages {
@@ -38,7 +38,7 @@ pipeline {
 
                 echo 🔐 Logging into IBM Cloud...
                 ibmcloud login --apikey %IBM_CLOUD_API_KEY%
-                ibmcloud target -r in-che
+                ibmcloud target -r au-syd
                 ibmcloud cr login
                 """
             }
