@@ -2,13 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"
-        DOCKER_HOST = 'tcp://localhost:2375'
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\IBM\\Cloud\\bin;C:\\Windows\\System32"
         IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Chennai
-        IBM_CLOUD_REGION = 'in-che'  // Specify your region, e.g., 'in-che' for Chennai
-        // Trusted Profile ID (replace with actual Profile ID)
-        IBM_CLOUD_PROFILE_ID = 'Profile-d0712891-efc9-4427-bff4-1b7bbc258c58'
+        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Tokyo
     }
 
     stages {
@@ -23,7 +19,7 @@ pipeline {
                 script {
                     bat """
                     echo 🔨 Building Docker Image...
-                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t config-manage:latest -f docker/Dockerfile .
+                    docker build -t config-manage:latest -f docker/Dockerfile .
                     """
                 }
             }
@@ -34,12 +30,12 @@ pipeline {
                 script {
                     bat 'echo 📦 Preparing to push Docker image...'
 
-                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
-                        // IBM Cloud Login with Trusted Profile ID (Using API Key)
+                    // Log in to IBM Cloud using API Key
+                    withCredentials([string(credentialsId: 'ibm-cloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
                         bat """
-                        echo 🔐 Logging into IBM Cloud with Trusted Profile...
-                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" login --apikey %IBM_CLOUD_API_KEY% --profile %IBM_CLOUD_PROFILE_ID% -r %IBM_CLOUD_REGION%
-                        "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" cr login
+                        echo 🔐 Logging into IBM Cloud...
+                        ibmcloud login --apikey %IBM_CLOUD_API_KEY% -r jp-tok
+                        ibmcloud cr login
                         """
                     }
 
@@ -47,8 +43,8 @@ pipeline {
                     def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
                     bat """
                     echo 🚀 Tagging and Pushing Docker Image...
-                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" tag config-manage:latest ${imageName}
-                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" push ${imageName}
+                    docker tag config-manage:latest ${imageName}
+                    docker push ${imageName}
                     """
                 }
             }
@@ -57,14 +53,16 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    bat """
-                    echo ⚙️ Configuring Kubernetes Cluster...
-                    "C:\\Program Files\\IBM\\Cloud\\bin\\ibmcloud.exe" ks cluster config --cluster <your-cluster-name>
+                    withCredentials([string(credentialsId: 'ibm-cloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                        bat """
+                        echo ⚙️ Configuring Kubernetes Cluster...
+                        ibmcloud ks cluster config --cluster <your-cluster-name>
 
-                    echo 📡 Deploying to Kubernetes...
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
-                    """
+                        echo 📡 Deploying to Kubernetes...
+                        kubectl apply -f k8s/deployment.yaml
+                        kubectl apply -f k8s/service.yaml
+                        """
+                    }
                 }
             }
         }
