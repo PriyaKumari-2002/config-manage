@@ -40,6 +40,7 @@ pipeline {
                 ibmcloud login -a https://cloud.ibm.com -u passcode -p DWipsATbNc
                 ibmcloud target -r ap-north
                 ibmcloud cr login
+                ibmcloud cr login --client docker
                 """
             }
 
