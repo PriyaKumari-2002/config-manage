@@ -26,51 +26,52 @@ pipeline {
             }
         }
 
-       stage('Push Docker Image') {
-    steps {
-        script {
-            bat 'echo 📦 Preparing to push Docker image...'
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    bat 'echo 📦 Preparing to push Docker image...'
 
-            withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
-                bat """
-                echo 🔐 Setting IBM Cloud API Endpoint...
-                ibmcloud api https://cloud.ibm.com
+                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
+                        bat """
+                        echo 🔐 Setting IBM Cloud API Endpoint...
+                        ibmcloud api https://cloud.ibm.com
 
-                echo 🔐 Logging into IBM Cloud...
-                ibmcloud login -a https://cloud.ibm.com -u kumari.priyakumari002@gmail.com -p Pk@28022002!
-                ibmcloud cr login
-                ibmcloud cr region-set ap-north
-                ibmcloud cr login --client docker
-                """
+                        echo 🔐 Logging into IBM Cloud...
+                        ibmcloud login -a https://cloud.ibm.com --apikey %IBM_CLOUD_API_KEY%
+                        ibmcloud cr login
+                        ibmcloud cr region-set ap-north
+                        ibmcloud cr login --client docker
+                        """
+                    }
+
+                    def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
+                    bat """
+                    echo 🚀 Tagging and Pushing Docker Image...
+                    docker tag config-manage:latest ${imageName}
+                    docker push ${imageName}
+                    """
+                }
             }
-
-            def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
-            bat """
-            echo 🚀 Tagging and Pushing Docker Image...
-            docker tag config-manage:latest ${imageName}
-            docker push ${imageName}
-            """
         }
-    }
-}
+
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                     bat """
-                     echo "🚀 Starting Minikube..."
-                     minikube start
-                     echo "📡 Deploying to Kubernetes..."
-                     kubectl apply -f k8s/deployment.yaml
-                     kubectl apply -f k8s/service.yaml
-                     echo "🌐 Accessing Application..."
-                     minikube service frontend-service
-                     """
-                        
-                    }
+                    bat """
+                    echo 🚀 Starting Minikube...
+                    minikube start
+
+                    echo 📡 Deploying to Kubernetes...
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+
+                    echo 🌐 Accessing Application...
+                    minikube service frontend-service
+                    """
                 }
             }
-        
-    
+        }
+    }  // 🔹 Closes `stages`
 
     post {
         success {
@@ -80,4 +81,4 @@ pipeline {
             echo '❌ Pipeline failed!'
         }
     }
-    }
+}  // 🔹 Closes `pipeline`
