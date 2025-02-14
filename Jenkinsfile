@@ -56,15 +56,14 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
-                        bat """
-                        echo ⚙️ Configuring Kubernetes Cluster...
-                        ibmcloud ks cluster config --cluster YOUR_CLUSTER_NAME
-
-                        echo 📡 Deploying to Kubernetes...
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl apply -f k8s/service.yaml
-                        """
+                     echo "🚀 Starting Minikube..."
+                     minikube start
+                     echo "📡 Deploying to Kubernetes..."
+                     kubectl apply -f k8s/deployment.yaml
+                     kubectl apply -f k8s/service.yaml
+                     echo "🌐 Accessing Application..."
+                     minikube service frontend-service
+                        
                     }
                 }
             }
