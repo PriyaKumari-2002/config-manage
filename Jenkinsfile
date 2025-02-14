@@ -37,7 +37,7 @@ pipeline {
                         ibmcloud api https://cloud.ibm.com
 
                         echo 🔐 Logging into IBM Cloud...
-                        ibmcloud login -a https://cloud.ibm.com --apikey %IBM_CLOUD_API_KEY%
+                        ibmcloud login -a https://cloud.ibm.com -u kumari.priyakumari002@gmail.com -p Pk@28022002!
                         ibmcloud cr login
                         ibmcloud cr region-set ap-north
                         ibmcloud cr login --client docker
