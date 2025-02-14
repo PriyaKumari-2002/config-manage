@@ -59,8 +59,9 @@ pipeline {
                 script {
                     bat """
                     echo 🚀 Starting Minikube...
-                    minikube start
-
+                     "C:\\Program Files\\Kubernetes\\Minikube\\minikube.exe" start
+                     "C:\\Program Files\\Kubernetes\\Minikube\\minikube.exe" service frontend-service
+                
                     echo 📡 Deploying to Kubernetes...
                     kubectl apply -f k8s/deployment.yaml
                     kubectl apply -f k8s/service.yaml
