@@ -56,6 +56,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
+                     bat """
                      echo "🚀 Starting Minikube..."
                      minikube start
                      echo "📡 Deploying to Kubernetes..."
@@ -63,6 +64,7 @@ pipeline {
                      kubectl apply -f k8s/service.yaml
                      echo "🌐 Accessing Application..."
                      minikube service frontend-service
+                     """
                         
                     }
                 }
