@@ -67,8 +67,8 @@ pipeline {
                     }
                 }
             }
-        }
-    }
+        
+    
 
     post {
         success {
