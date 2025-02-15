@@ -1,0 +1,41 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  IBM_CLOUD_REGISTRY_NAMESPACE: "config-manage"
+  IBM_CLOUD_REGISTRY_URL: "jp.icr.io"
+  DOCKER_IMAGE_FRONTEND: "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/frontend-app:latest"
+  DOCKER_IMAGE_BACKEND: "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/backend-app:latest"
+
+build:
+  stage: build
+  script:
+    - echo "🔨 Building Docker Images..."
+    -docker build -t config-manage:latest -f docker/Dockerfile .
+
+test:
+  stage: test
+  script:
+    - echo "🧪 Running Tests..."
+    - # Add your test commands here (e.g., unit tests, integration tests)
+
+push:
+  stage: deploy
+  script:
+   - echo 🔐 Setting IBM Cloud API Endpoint...
+   - ibmcloud api https://cloud.ibm.com
+   - echo 🔐 Logging into IBM Cloud...
+   - ibmcloud login -a https://cloud.ibm.com -u kumari.priyakumari002@gmail.com -p Pk@28022002!
+   - ibmcloud cr login
+   - ibmcloud cr region-set ap-north
+   - ibmcloud cr login --client docker
+
+deploy:
+  stage: deploy
+  script:
+    - echo "⚙️ Configuring Kubernetes Cluster..."
+    - echo "📡 Deploying to Kubernetes..."
+    - kubectl apply -f k8s/deployment.yaml
+    - kubectl apply -f k8s/service.yaml
