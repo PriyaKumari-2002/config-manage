@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\IBM\\Cloud\\bin;C:\\Windows\\System32"
-        IBM_CLOUD_REGION = 'ap-north'
-        IBM_CLOUD_REGISTRY_NAMESPACE = 'config-manage'
-        IBM_CLOUD_REGISTRY_URL = 'jp.icr.io'  // IBM Container Registry for Tokyo
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Windows\\System32"
+        IMAGE_NAME = 'config-manage'
+        CONTAINER_NAME = 'config-manage-container'
     }
 
     stages {
@@ -20,34 +19,30 @@ pipeline {
                 script {
                     bat """
                     echo 🔨 Building Docker Image...
-                    docker build -t config-manage:latest -f docker/Dockerfile .
+                    docker build -t %IMAGE_NAME%:latest -f docker/Dockerfile .
                     """
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Remove Existing Container') {
             steps {
                 script {
-                    bat 'echo 📦 Preparing to push Docker image...'
-
-                    withCredentials([string(credentialsId: 'ibmcloud-api-key', variable: 'IBM_CLOUD_API_KEY')]) {
-                        bat """
-                        echo 🔐 Setting IBM Cloud API Endpoint...
-                        ibmcloud api https://cloud.ibm.com
-
-                        echo 🔐 Logging into IBM Cloud...
-                        ibmcloud login --apikey ${IBM_CLOUD_API_KEY} -r ${IBM_CLOUD_REGION}
-                        ibmcloud cr login
-                        ibmcloud cr region-set ${IBM_CLOUD_REGION}
-                        """
-                    }
-
-                    def imageName = "${IBM_CLOUD_REGISTRY_URL}/${IBM_CLOUD_REGISTRY_NAMESPACE}/config-manage:latest"
                     bat """
-                    echo 🚀 Tagging and Pushing Docker Image...
-                    docker tag config-manage:latest ${imageName}
-                    docker push ${imageName}
+                    echo 🧹 Checking if old container exists...
+                    docker stop %CONTAINER_NAME% || echo Container not running
+                    docker rm %CONTAINER_NAME% || echo Container not found
+                    """
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    bat """
+                    echo 🚀 Running Docker Container...
+                    docker run -d -p 8083:83 --name %CONTAINER_NAME% %IMAGE_NAME%:latest
                     """
                 }
             }
