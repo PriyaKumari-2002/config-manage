@@ -53,8 +53,7 @@ pipeline {
                 }
             }
         }
-
-  
+    }
 
     post {
         success {
