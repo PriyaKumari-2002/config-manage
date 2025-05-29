@@ -37,10 +37,9 @@ pipeline {
                         ibmcloud api https://cloud.ibm.com
 
                         echo 🔐 Logging into IBM Cloud...
-                        ibmcloud login -a https://cloud.ibm.com -u kumari.priyakumari002@gmail.com -p Pk@28022002!
+                        ibmcloud login --apikey ${IBM_CLOUD_API_KEY} -r ${IBM_CLOUD_REGION}
                         ibmcloud cr login
-                        ibmcloud cr region-set ap-north
-                        ibmcloud cr login --client docker
+                        ibmcloud cr region-set ${IBM_CLOUD_REGION}
                         """
                     }
 
@@ -63,5 +62,4 @@ pipeline {
             echo '❌ Pipeline failed!'
         }
     }
-}  // 🔹 Closes `pipeline`
 }
