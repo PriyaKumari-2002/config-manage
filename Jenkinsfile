@@ -54,25 +54,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    bat """
-                    echo 🚀 Starting Minikube...
-                     "C:\\Program Files\\Kubernetes\\Minikube\\minikube.exe" start
-                     "C:\\Program Files\\Kubernetes\\Minikube\\minikube.exe" service config-manage-service
-                
-                    echo 📡 Deploying to Kubernetes...
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
-
-                    echo 🌐 Accessing Application...
-                    minikube service config-manage-service
-                    """
-                }
-            }
-        }
-    }  // 🔹 Closes `stages`
+  
 
     post {
         success {
